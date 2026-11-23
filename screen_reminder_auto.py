@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-screen_reminder_auto.py — pywinauto 脚本自动亮角标
+screen_reminder_auto.py — pywinauto 脚本自动亮起界面提醒
 
 在你的自动化 py 脚本顶部一行 import，之后所有 pywinauto 鼠标/键盘操作
-都会自动在屏幕右下角显示操作角标（不抢焦点、鼠标穿透、自动淡出），
-无需改动你的操作代码：
+都会自动亮起悬浮界面提醒（四边呼吸发光边框 + 顶部居中面板，不抢焦点、
+鼠标穿透、自动淡出），无需改动你的操作代码：
 
     import screen_reminder_auto          # 自动包装 pywinauto
     from pywinauto import mouse
-    mouse.click(...)                     # 自动亮角标「正在点击 left」
+    mouse.click(...)                     # 自动亮起界面提醒「正在点击 left」
 
 也提供 context manager（任务级，保持显示直到结束）：
 
     with screen_reminder_auto.task("正在执行论文批量导出"):
-        ...  # 操作期间角标常亮，结束后自动关闭
+        ...  # 操作期间界面提醒常亮，结束后自动关闭
 
 依赖：本机 screen_reminder.py 守护（~/.pi/agent/scripts/screen_reminder.py）。
 import 时自动确保守护在跑（幂等）。
@@ -44,7 +44,7 @@ def _fire(args):
 
 
 def remind(text, hold=False):
-    """更新角标文本（节流 500ms，避免高频刷新）"""
+    """更新界面提醒文本（节流 500ms，避免高频刷新）"""
     now = time.time()
     if now - _last[0] < 0.5:
         return
@@ -58,7 +58,7 @@ _fire(['start'])
 
 
 def _patch_pywinauto():
-    """monkeypatch pywinauto 常用入口，操作时自动亮角标"""
+    """monkeypatch pywinauto 常用入口，操作时自动亮起界面提醒"""
     try:
         import pywinauto.mouse as mouse
         import pywinauto.keyboard as keyboard
@@ -105,8 +105,64 @@ def _patch_pywinauto():
 _patch_pywinauto()
 
 
+def _patch_pyautogui():
+    """monkeypatch pyautogui 鼠标入口（click-recorder 的 player 用 pyautogui，不用 pywinauto）"""
+    try:
+        import pyautogui
+    except Exception:
+        return
+
+    if not getattr(pyautogui, '_reminder_patched', False):
+        _orig_click = pyautogui.click
+        def click(*a, **k):
+            remind('正在点击 %s' % (k.get('button', a[0] if a else 'left')))
+            return _orig_click(*a, **k)
+        pyautogui.click = click
+
+        _orig_move_to = pyautogui.moveTo
+        def moveTo(*a, **k):
+            remind('正在移动鼠标')
+            return _orig_move_to(*a, **k)
+        pyautogui.moveTo = moveTo
+
+        pyautogui._reminder_patched = True
+
+
+def _patch_pynput():
+    """monkeypatch pynput.keyboard.Controller（click-recorder 用其 type/press 注入键盘）"""
+    try:
+        from pynput.keyboard import Controller
+    except Exception:
+        return
+
+    if not getattr(Controller, '_reminder_patched', False):
+        _orig_type = Controller.type
+        _orig_press = Controller.press
+        _orig_release = Controller.release
+
+        def _type(self, *a, **k):
+            remind('正在输入文字')
+            return _orig_type(self, *a, **k)
+
+        def _press(self, *a, **k):
+            remind('正在发送按键')
+            return _orig_press(self, *a, **k)
+
+        def _release(self, *a, **k):
+            return _orig_release(self, *a, **k)
+
+        Controller.type = _type
+        Controller.press = _press
+        Controller.release = _release
+        Controller._reminder_patched = True
+
+
+_patch_pyautogui()
+_patch_pynput()
+
+
 def task(text):
-    """context manager：进入时保持显示，退出时关闭（任务级角标）"""
+    """context manager：进入时保持显示，退出时关闭（任务级界面提醒）"""
     from contextlib import contextmanager
 
     @contextmanager

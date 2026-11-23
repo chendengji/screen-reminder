@@ -4,7 +4,7 @@ import { spawn } from "node:child_process";
 import * as path from "node:path";
 import * as os from "node:os";
 
-// 屏幕悬浮提醒角标脚本（不抢焦点 / 鼠标穿透 / 置顶 / 自动淡出）
+// 屏幕悬浮界面提醒脚本（四边呼吸发光边框 + 顶部居中面板；不抢焦点 / 鼠标穿透 / 自动淡出）
 const SCRIPT = path.join(os.homedir(), ".pi", "agent", "scripts", "screen_reminder.py");
 
 // 自动感知已由守护进程承担（screen_reminder.py 自行监控 pi session，
@@ -39,7 +39,7 @@ export default function (pi: ExtensionAPI) {
     name: "screen_reminder",
     label: "Screen Reminder",
     description:
-      "屏幕悬浮提醒角标（右下角置顶、不抢焦点、鼠标点击穿透、自动淡出）。" +
+      "屏幕悬浮界面提醒（四边呼吸发光边框 + 顶部居中面板；不抢焦点、鼠标点击穿透、自动淡出）。" +
       "action: start 启动常驻守护；set \"文本\" 更新提醒（fire-and-forget 零输出，默认 4 秒自动淡出，" +
       "hold=true 则保持显示）；stop 停止；status 查询。用于 agent 做 Windows GUI 自动化时提示当前操作。",
     promptSnippet: "Show a corner reminder badge on screen",
