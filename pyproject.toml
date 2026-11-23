@@ -1,0 +1,18 @@
+[project]
+name = "screen-reminder"
+version = "0.1.0"
+description = "界面操作状态提醒：agent 做 Windows GUI 自动化时，屏幕四边呼吸发光边框 + 顶部居中面板提示当前操作（不抢焦点、鼠标点击穿透、daemon 自动感知）"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "chendengji" }]
+dependencies = [
+    "pywin32>=306",
+    "pillow>=10.0",
+]
+
+[tool.setuptools]
+packages = ["wmcp_reminder"]
+
+[tool.setuptools.package-data]
+wmcp_reminder = ["*.py"]
