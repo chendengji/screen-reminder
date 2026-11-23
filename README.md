@@ -80,13 +80,12 @@ daemon 每 500ms 增量扫描 pi 的 session JSONL，检测 assistant 消息里�
 - 会话监控：`~/.pi/agent/sessions/*/*.jsonl`（daemon 增量读）
 - 环境变量：`SCREEN_REMINDER_RUNTIME_DIR`（可覆盖运行时目录，默认 `~/.pi/reminder`）
 
-## 已踩坑（定稿修复）
+## 变更与踩坑
 
-1. **Segoe UI 中文显示不全** → 改微软雅黑 `msyh.ttc`
-2. **`_NOTICE_SHORTCUT=''` 时 `partition('')` 抛 `ValueError: empty separator`** → 判空跳过分割
-3. **「亮一下就没」**：初始 `set_active(True)` 后主循环立即 `set_active(False)` → 初始不显示，等 agent 操作触发
-4. **快捷键徽章残留**：原版 `Ctrl+Alt+Shift+Backspace` 接管提示 → 清空 `_NOTICE_SHORTCUT`
-5. **边框宽度**：`_BORDER 56 → 112`（用户要求翻倍）
+详细变更记录、已踩坑清单（6 条）、设计要点、运行时文件见 **[REFERENCE.md](REFERENCE.md)**。
+
+- v0.1.1：修复**聊天误触发**（offset 重置扫描历史 `automation_*` → 跳到文件尾，只对新调用生效）
+- v0.1.0：初始发布（复用 Windows-MCP 视觉层 + 守护自动感知）
 
 ## 许可
 

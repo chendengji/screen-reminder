@@ -165,7 +165,8 @@ def _scan_new_toolcalls(path, offset):
     except OSError:
         return offset, None
     if size < offset:
-        offset = 0
+        # 文件被重写/截断：跳到文件尾，不重新扫描历史（否则聊天时重复检测旧 automation_*）
+        offset = size
     last = None
     try:
         with open(path, 'rb') as f:
@@ -299,7 +300,11 @@ def run_daemon():
         mon = state['mon']
         if mon['path'] != path:
             mon['path'] = path
-            mon['offset'] = 0
+            # 换 session：跳到文件尾，不重新扫描历史 automation_*（聊天/历史不触发）
+            try:
+                mon['offset'] = os.path.getsize(path)
+            except OSError:
+                mon['offset'] = 0
             mon['last'] = ''
         off, auto = _scan_new_toolcalls(path, mon['offset'])
         mon['offset'] = off
