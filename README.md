@@ -89,4 +89,4 @@ daemon 每 500ms 增量扫描 pi 的 session JSONL，检测 assistant 消息里�
 
 ## 许可
 
-MIT。视觉层 `wmcp_reminder/` 基于 [CursorTouch/Windows-MCP](https://github.com/CursorTouch/Windows-MCP)（MIT）的 `desktop/control_overlay.py`、`control_overlay_art.py`、`flash_overlay.py`、`overlay_bitmap.py` 改造（动态文字、动态颜色、去 WDA_EXCLUDEFROMCAPTURE、无接管控制流）。
+MIT。视觉层 `wmcp_reminder/` 基于 [CursorTouch/Windows-MCP](https://github.com/CursorTouch/Windows-MCP)（MIT）的 `desktop/control_overlay.py`、`control_overlay_art.py`、`flash_overlay.py`、`overlay_bitmap.py` 改造（动态文字、动态颜色、WDA_EXCLUDEFROMCAPTURE 截图穿透、无接管控制流）。

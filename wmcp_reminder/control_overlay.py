@@ -95,8 +95,8 @@ class _Layer:
         self.opacity: int | None = None
         try:
             flash_overlay._push_bitmap(self.hwnd, x, y, width, height, bgra)
-            # 改造：跳过 WDA_EXCLUDEFROMCAPTURE，让操作提醒可被截图捕获/验证
-            # （Windows-MCP 原意是控制指示器不进截图；操作提醒需要可视化演示）
+            # 截图穿透：WDA_EXCLUDEFROMCAPTURE 让控制指示器/操作提醒不被截图捕获（Windows-MCP 原意）
+            _user32.SetWindowDisplayAffinity(self.hwnd, _WDA_EXCLUDEFROMCAPTURE)
         except BaseException:
             self.close()
             raise

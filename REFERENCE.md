@@ -5,6 +5,12 @@
 
 ## 版本变更
 
+### v0.1.2（2026-11-23）
+- **恢复截图穿透**：重新启用 `SetWindowDisplayAffinity(WDA_EXCLUDEFROMCAPTURE)`（每个 `_Layer` 窗口创建后调用）。
+  - 效果：四边呼吸发光 + 顶部面板**不被截图/录屏捕获**（用户截屏、OBS、agent 截图都穿透它），屏幕上仍正常显示。
+  - 验证：PrintWindow 捕获面板中心像素由深蓝 `(6,33,70)` 变 `(0,0,0)`（空/透明 = 穿透）。
+  - 说明：此前为可视化演示曾移除 WDA；现按需求恢复（截图穿透）。
+
 ### v0.1.1（2026-11-23）
 - **修复聊天误触发 bug**：daemon 监控 session 时，`offset` 重置为 `0` 会重新扫描整个文件，把历史 `automation_*` 调用（如 computer-use 演示留下的 `automation_keyboard`）再次检测到，导致**聊天时重复亮「正在键盘输入」**。
   - 修复：`_scan_new_toolcalls` 里 `size < offset` 时 `offset = size`（跳到文件尾）；`monitor_tick` 里换 session 时 `mon['offset'] = os.path.getsize(path)`（同样跳到尾）。
@@ -13,7 +19,7 @@
 - 同步：本地 `screen_reminder.py` 与分发版一致。
 
 ### v0.1.0（2026-11-23，初始发布）
-- 复用 Windows-MCP 视觉层（`wmcp_reminder/`），改造为动态文字 + 动态颜色 + 去 WDA_EXCLUDEFROMCAPTURE + 无接管控制流。
+- 复用 Windows-MCP 视觉层（`wmcp_reminder/`），改造为动态文字 + 动态颜色 + WDA_EXCLUDEFROMCAPTURE（截图穿透）+ 无接管控制流。
 - 守护自动感知：daemon 每 500ms 增量读 pi session 的 `automation_*`/`cua_*` 调用，自动亮+变文字+变颜色，30s 无操作自动隐藏。
 - 分发版发布 GitHub：`github.com/chendengji/screen-reminder`（public）。
 
