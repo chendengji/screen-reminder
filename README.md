@@ -15,16 +15,18 @@ Agent 做 Windows GUI 自动化时，在屏幕**四边呼吸发光边框 + 顶�
 ## 架构
 
 ```
-screen_reminder.py        # 主入口：薄客户端（start/set/stop/status + 文件 IPC + session 监控 + CREATE_NO_WINDOW）
-wmcp_reminder/            # 视觉层（复用 Windows-MCP control_overlay / control_overlay_art / flash_overlay / overlay_bitmap / uia）
-screen_reminder_auto.py   # pywinauto 自动包装（import 即自动亮提醒 + task context manager）
+screen_reminder.py          # 主入口：薄客户端（start/set/stop/status + 文件 IPC + session 监控 + CREATE_NO_WINDOW）
+wmcp_reminder/              # 视觉层（复用 Windows-MCP control_overlay / control_overlay_art / flash_overlay / overlay_bitmap / uia）
+screen_reminder_auto.py     # pywinauto 自动包装（import 即自动亮提醒 + task context manager）
+extensions/screen-reminder.ts # pi 扩展：注册 screen_reminder 工具（start/set/stop/status）+ init 时确保 daemon 常驻
 ```
 
-**3 个调用入口**：
+**4 个调用入口**：
 
-1. **命令行**：`python screen_reminder.py start|set|stop|status`（daemon 用 `CREATE_NO_WINDOW` 启动，无黑窗口）
-2. **Python API**：`import screen_reminder_auto`（pywinauto 包装，`with task(...):` 自动亮/灭）
-3. **守护自动感知**：daemon 每 500ms 增量读 pi session 的 `automation_*` / `cua_*` 工具调用，自动亮起 + 变换文字 + 变换颜色，30s 无操作自动隐藏（`AUTO_IDLE_MS = 30000`）
+1. **pi 工具**：`screen_reminder`（由 `extensions/screen-reminder.ts` 注册；agent 可手动 `start`/`set`/`stop`/`status`，init 时自动确保 daemon 常驻）
+2. **命令行**：`python screen_reminder.py start|set|stop|status`（daemon 用 `CREATE_NO_WINDOW` 启动，无黑窗口）
+3. **Python API**：`import screen_reminder_auto`（pywinauto 包装，`with task(...):` 自动亮/灭）
+4. **守护自动感知**：daemon 每 500ms 增量读 pi session 的 `automation_*` / `cua_*` 工具调用，自动亮起 + 变换文字 + 变换颜色，30s 无操作自动隐藏（`AUTO_IDLE_MS = 30000`）
 
 ## 安装
 
